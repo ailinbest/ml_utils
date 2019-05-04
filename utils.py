@@ -5,9 +5,21 @@ from sklearn.model_selection import learning_curve
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
+from sklearn.metrics import roc_auc_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
+
+
+def describe_missing(df, include=None, exclude=None):
+    """
+        用来描述datafame的Object类型与非object类型数据的基本情况与缺失率
+        df: dataframe-like，要描述的数据
+        include: list-like，选择的数据类型
+        exclude: list-like，排除的数据类型
+    """
+    return df.select_dtypes(include=include, exclude=exclude).describe().T \
+        .assign(missing_pct=df.apply(lambda x: (len(x) - x.count()) / len(x)))
 
 
 def plot_learning_curve(estimator, X, y, title='学习曲线', ylim=None, cv=None, n_jobs=-1,
@@ -101,9 +113,13 @@ def plot_confusion_matrix(y_test, y_predict, classes,
 
 
 def print_recall_precision_f1(y_true, y_pred):
-    print('precision score:', precision_score(y_true, y_pred))
-    print('recall score:', recall_score(y_true, y_pred))
-    print('f1 score:', f1_score(y_true, y_pred))
+    print('precision score: %.4f' % precision_score(y_true, y_pred))
+    print('recall score: %.4f' % recall_score(y_true, y_pred))
+    print('f1 score: %.4f' % f1_score(y_true, y_pred))
+
+
+def print_roc_auc_score(y_test, y_score):
+    print('AUC score:', roc_auc_score(y_test, y_score[:, 1]))
 
 
 def plot_auc_curve(y_test, y_score):
