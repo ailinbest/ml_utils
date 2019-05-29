@@ -22,6 +22,47 @@ def describe_missing(df, include=None, exclude=None):
         .assign(missing_pct=df.apply(lambda x: (len(x) - x.count()) / len(x)))
 
 
+def plot_pie(data_series, title=None, startangle=0, pctdistance=0.7,
+             labeldistance=1.5, autopct='%1.0f%%', font_size='medium',
+             title_font_size=20, explode=None, shadow=True):
+    """
+    参数说明：
+    data_series: pd.Series类型,包含数据和index
+    title：图片名称
+    startangle:开始的角度，3点钟的位置为0，逆时针，12点的位置为90°
+    pctdistance:比例数据的位置，1代表在圆的边上，0代表在圆心上
+    labeldistance:label的位置
+    autopct:
+    font_size:字体的大小
+    explode:是否分裂，是一个数组类型的，元素个数与index个数相同
+    """
+    from matplotlib import font_manager as fm
+    # 设置绘图区域大小
+    fig, axes = plt.subplots(figsize=(10, 5), ncols=2)
+    # 把两个图割开,方便后边分别设置
+    ax1, ax2 = axes.ravel()
+
+    patches, texts, autotexts = ax1.pie(data_series.values, labels=data_series.index, autopct=autopct,
+                                        shadow=shadow, startangle=startangle, pctdistance=pctdistance, explode=explode)
+
+    ax1.axis('equal')
+    # 重新设置字体大小
+    proptease = fm.FontProperties()
+    proptease.set_size(font_size)
+    # font size include: ‘xx-small’,x-small’,'small’,'medium’,‘large’,‘x-large’,‘xx-large’ or number, e.g. '12'
+    plt.setp(autotexts, fontproperties=proptease)
+    plt.setp(texts, fontproperties=proptease)
+
+    ax1.set_title(title, loc='center', fontsize=title_font_size)
+
+    # ax2 只显示图例（legend）
+    ax2.axis('off')
+    ax2.legend(patches, data_series.index, loc='upper left')
+
+    plt.tight_layout()
+    plt.show()
+
+
 def plot_learning_curve(estimator, X, y, title='学习曲线', ylim=None, cv=None, n_jobs=-1,
                         train_sizes=np.linspace(.05, 1., 20), verbose=0, plot=True):
     """
