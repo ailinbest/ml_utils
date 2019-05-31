@@ -166,8 +166,9 @@ def print_roc_auc_score(y_test, y_score):
 def plot_auc_curve(y_test, y_score):
     """
     绘制auc曲线
-    :param y_test:
-    :param y_score:
+    :param y_test:二分类中的真实值，比如： [1,0,...,0,0]，shape=[n_samples]
+    :param y_score: 预测分类的概率，有的classifier有predict_pro方法，得到是n_samples * n_classes的矩阵,第一列是预测为0的概率，
+    第二列是预测为1的概率。所以取了第一列
     :return:
     """
     # fpr,tpr,thresholds 分别为假正率、真正率和阈值
