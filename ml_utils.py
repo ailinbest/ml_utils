@@ -160,7 +160,7 @@ def print_recall_precision_f1(y_true, y_pred):
 
 
 def print_roc_auc_score(y_test, y_score):
-    print('AUC score:', roc_auc_score(y_test, y_score[:, 1]))
+    print('AUC score: %.4f' % roc_auc_score(y_test, y_score[:, 1]))
 
 
 def plot_auc_curve(y_test, y_score):
@@ -168,19 +168,21 @@ def plot_auc_curve(y_test, y_score):
     绘制auc曲线
     :param y_test:二分类中的真实值，比如： [1,0,...,0,0]，shape=[n_samples]
     :param y_score: 预测分类的概率，有的classifier有predict_pro方法，得到是n_samples * n_classes的矩阵,第一列是预测为0的概率，
-    第二列是预测为1的概率。所以取了第一列
+    第二列是预测为1的概率。所以取了第二列
     :return:
     """
     # fpr,tpr,thresholds 分别为假正率、真正率和阈值
-    tpr, fpr, thresholds = roc_curve(y_test, y_score[:, 0])
-    # 计算auc的值
+    if y_score.shape[1] == 2:
+        fpr, tpr, thresholds = roc_curve(y_test, y_score[:, 1])
+    else:
+        fpr, tpr, thresholds = roc_curve(y_test, y_score)
+    # 计算auc的值,面积
     roc_auc = auc(fpr, tpr)
     plt.figure(figsize=(10, 10))
     # 假正率为横坐标，真正率为纵坐标做曲线
-    plt.plot(fpr, tpr, color='darkorange',
-             lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.4f)' % roc_auc)
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
+    plt.xlim([-0.01, 1.0])
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
