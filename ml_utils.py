@@ -11,15 +11,41 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 
 
-def describe_missing(df, include=None, exclude=None):
+def describe_missing(df, include=None, exclude=None, missing_only=True,
+                     sort=True, ascending=False):
     """
-        用来描述datafame的Object类型与非object类型数据的基本情况与缺失率
-        df: dataframe-like，要描述的数据
-        include: list-like，选择的数据类型
-        exclude: list-like，排除的数据类型
+    用来描述DataFrame的Object类型与非object类型数据的基本情况与缺失率
+    :param df: DataFrame-like，要描述的数据
+    :param include: list-like or str 选择的数据类型,like: float,int
+            numerical features: 'number' or np.number
+            categorical features: 'object' or 'O'
+    :param exclude: list-like，排除的数据类型: object
+    :param missing_only: only return missing percent > 0 columns description
+    :param sort: 是否根据缺失率排序，默认是根据missing_pct降序排列
+    :param ascending: 默认为降序
+    :return: df
     """
-    return df.select_dtypes(include=include, exclude=exclude).describe().T \
+
+    df = df.select_dtypes(include=include, exclude=exclude).describe().T \
         .assign(missing_pct=df.apply(lambda x: (len(x) - x.count()) / len(x)))
+
+    if missing_only:
+        df = df[df['missing_pct'] > 0]
+
+    if sort:
+        return df.sort_values(by='missing_pct', ascending=ascending)
+    else:
+        return df
+
+
+def specific_dtype_column_names(df, dtype):
+    """
+    获取指定类型的列名
+    :param df:
+    :param dtype: 'number','object','bool'
+    :return:
+    """
+    return df.select_dtypes(include=dtype).columns.values
 
 
 def plot_pie(data_series, title=None, startangle=0, pctdistance=0.7,
@@ -189,3 +215,5 @@ def plot_auc_curve(y_test, y_score):
     plt.title('Receiver operating characteristic example')
     plt.legend(loc="lower right")
     plt.show()
+
+# TODO 需要加入画图的描述
