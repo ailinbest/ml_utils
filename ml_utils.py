@@ -94,19 +94,18 @@ def plot_learning_curve(estimator, X, y, title='学习曲线', ylim=None, cv=Non
     """
     train_size:X 中用来作样本的比例，如果是0.1，则0.1*X用来作全部样本（包括训练集和测试集）
     cv：用于交叉验证的参数，cv=5代表把X随机分为5份，其中四个作为训练集，一个作为测试集
+
+    画出data在某模型上的learning curve.
+    参数解释
+    ----------
+    estimator : 你用的分类器。
+    title : 表格的标题。
+    X : 输入的feature，numpy类型
+    y : 输入的target vector
+    ylim : tuple格式的(ymin, ymax), 设定图像中纵坐标的最低点和最高点
+    cv : 做cross-validation的时候，数据分成的份数，其中一份作为cv集，其余n-1份作为training(默认为3份)
+    n_jobs : 并行的的任务数(默认1)
     """
-    """
-        画出data在某模型上的learning curve.
-        参数解释
-        ----------
-        estimator : 你用的分类器。
-        title : 表格的标题。
-        X : 输入的feature，numpy类型
-        y : 输入的target vector
-        ylim : tuple格式的(ymin, ymax), 设定图像中纵坐标的最低点和最高点
-        cv : 做cross-validation的时候，数据分成的份数，其中一份作为cv集，其余n-1份作为training(默认为3份)
-        n_jobs : 并行的的任务数(默认1)
-        """
     train_sizes, train_scores, test_scores = learning_curve(
         estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes, verbose=verbose)
 
