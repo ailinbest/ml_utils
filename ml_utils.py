@@ -1,14 +1,16 @@
 import itertools
 import numpy as np
+import pandas as pd
+# plots
 import matplotlib.pyplot as plt
+import seaborn as sns
+# metrics
 from sklearn.model_selection import learning_curve
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import auc
-from sklearn.metrics import roc_curve
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix, auc, roc_curve, roc_auc_score, precision_score, recall_score, f1_score
+# stats
+from scipy.stats import skew, norm
+from scipy.special import boxcox1p
+from scipy.stats import boxcox_normmax
 
 
 def describe_missing(df, include=None, exclude=None, missing_only=True,
@@ -46,6 +48,28 @@ def specific_dtype_column_names(df, dtype):
     :return:
     """
     return df.select_dtypes(include=dtype).columns.values
+
+
+def plot_univariate_dist(df, col_name):
+    """
+    plot univariate distribution for regression task, to see the numeric target column distribution.
+    :param df: DataFrame
+    :param col_name: column name, str
+    """
+    sns.set_style('white')
+    sns.set_color_codes(palette='deep')
+    f, ax = plt.subplots(figsize=(8, 6))
+    sns.distplot(df[col_name], color='b')
+    ax.xaxis.grid(False)
+    ax.set(ylabel='Frequecy')
+    ax.set(xlabel=col_name)
+    ax.set(title=f'{col_name} distribution')
+    sns.despine(trim=True, left=True)
+    (mu, sigma) = norm.fit(df[col_name])
+    # print('\n mu = {:.2f} and sigma = {:.2f}\n'.format(mu,sigma))
+    plt.legend(['Normal dist. ($\mu=$ {:.2f} and $\sigma=$ {:.2f})'.format(
+        mu, sigma)], loc='best')
+    plt.show()
 
 
 def plot_pie(data_series, title=None, startangle=0, pctdistance=0.7,
@@ -128,8 +152,10 @@ def plot_learning_curve(estimator, X, y, title='学习曲线', ylim=None, cv=Non
                          alpha=0.1, color="b")
         plt.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std,
                          alpha=0.1, color="r")
-        plt.plot(train_sizes, train_scores_mean, 'o-', color="b", label=u"训练集上得分")
-        plt.plot(train_sizes, test_scores_mean, 'o-', color="r", label=u"交叉验证集上得分")
+        plt.plot(train_sizes, train_scores_mean,
+                 'o-', color="b", label=u"训练集上得分")
+        plt.plot(train_sizes, test_scores_mean,
+                 'o-', color="r", label=u"交叉验证集上得分")
 
         plt.legend(loc="best")
 
@@ -137,8 +163,10 @@ def plot_learning_curve(estimator, X, y, title='学习曲线', ylim=None, cv=Non
         plt.gca().invert_yaxis()
         plt.show()
 
-    midpoint = ((train_scores_mean[-1] + train_scores_std[-1]) + (test_scores_mean[-1] - test_scores_std[-1])) / 2
-    diff = (train_scores_mean[-1] + train_scores_std[-1]) - (test_scores_mean[-1] - test_scores_std[-1])
+    midpoint = ((train_scores_mean[-1] + train_scores_std[-1]) +
+                (test_scores_mean[-1] - test_scores_std[-1])) / 2
+    diff = (train_scores_mean[-1] + train_scores_std[-1]
+            ) - (test_scores_mean[-1] - test_scores_std[-1])
     return midpoint, diff
 
 
@@ -205,7 +233,8 @@ def plot_auc_curve(y_test, y_score):
     roc_auc = auc(fpr, tpr)
     plt.figure(figsize=(10, 10))
     # 假正率为横坐标，真正率为纵坐标做曲线
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.4f)' % roc_auc)
+    plt.plot(fpr, tpr, color='darkorange', lw=2,
+             label='ROC curve (area = %0.4f)' % roc_auc)
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([-0.01, 1.0])
     plt.ylim([0.0, 1.05])
