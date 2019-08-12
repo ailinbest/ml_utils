@@ -84,7 +84,8 @@ def plot_pie(data_series, title=None, startangle=0, pctdistance=0.7,
     labeldistance:label的位置
     autopct:
     font_size:字体的大小
-    explode:是否分裂，是一个数组类型的，元素个数与index个数相同
+    explode:是否分裂，是一个数组类型的，元素个数与index个数相同,比如一个一个Series有四个数据，
+            [0.05,0,0,0]表示第一个数分裂的间距大小为0.05,其它的三个不分裂。
     """
     from matplotlib import font_manager as fm
     # 设置绘图区域大小
