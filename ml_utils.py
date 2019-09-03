@@ -278,7 +278,7 @@ def plot_auc_curve(y_test, y_score):
     plt.legend(loc="lower right")
     plt.show()
 
-def plot_gridsearch_cv(results,param_name,x_min,x_max,y_min,y_max,save=False,saves='MyFigure.png',scoring=scoring):
+def plot_gridsearch_cv(results,param_name,scoring,x_min,x_max,y_min,y_max,save=False,saves='MyFigure.png'):
     """
     绘制单因素gridsearch cv的结果
     result: gridsearch.cv_results_
