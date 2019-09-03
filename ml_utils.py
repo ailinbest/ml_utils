@@ -7,6 +7,7 @@ import seaborn as sns
 # metrics
 from sklearn.model_selection import learning_curve
 from sklearn.metrics import confusion_matrix, auc, roc_curve, roc_auc_score, precision_score, recall_score, f1_score
+from sklearn import metrics
 # stats
 from scipy.stats import skew, norm
 from scipy.special import boxcox1p
@@ -235,10 +236,14 @@ def plot_confusion_matrix(y_test, y_predict, classes,
     plt.tight_layout()
 
 
-def print_recall_precision_f1(y_true, y_pred):
-    print('precision score: %.4f' % precision_score(y_true, y_pred))
-    print('recall score: %.4f' % recall_score(y_true, y_pred))
-    print('f1 score: %.4f' % f1_score(y_true, y_pred))
+def print_recall_precision_f1(y_true, y_pred,pos_label=1):
+    """
+    二分类：默认是计算1类别的recall，precision，f1值
+    pos_label：指定要计算的分类
+    """
+    print('precision score: %.4f' % precision_score(y_true, y_pred,pos_label=pos_label))
+    print('recall score: %.4f' % recall_score(y_true, y_pred,pos_label=pos_label))
+    print('f1 score: %.4f' % f1_score(y_true, y_pred,pos_label=pos_label))
 
 
 def print_roc_auc_score(y_test, y_score):
@@ -273,4 +278,74 @@ def plot_auc_curve(y_test, y_score):
     plt.legend(loc="lower right")
     plt.show()
 
-# TODO 需要加入画图的描述
+def plot_gridsearch_cv(results,param_name,x_min,x_max,y_min,y_max,save=False,saves='MyFigure.png',scoring=scoring):
+    """
+    绘制单因素gridsearch cv的结果
+    result: gridsearch.cv_results_
+    param_name: 要搜索的参数
+    x_min: x轴最小值
+    x_max: x轴最大值
+    y_min: y轴最小值
+    y_max: y轴最大值
+    scoring: dict,scorer可以指定正类的，以-1作为positive class,gridsearch也可以有多个评分标准
+             比如：scoring = {'AUC':'roc_auc','Recall':make_scorer(recall_score,pos_label=-1)}
+    """
+    plt.figure(figsize=(10,8))
+    plt.title('GridSearchCV for ' + param_name,fontsize=24)
+    
+    plt.xlabel(param_name,fontsize=14)
+    plt.ylabel("score",fontsize=14)
+    plt.grid()
+    
+    ax = plt.axes()
+    ax.set_xlim(x_min,x_max)
+    ax.set_ylim(y_min,y_max)
+    
+    pad = 0.005
+    X_axis = np.array(results["param_"+param_name].data,dtype=float)
+
+    #('train','--')
+    sample = 'test'
+    style = '--'
+    for scorer,color in zip(sorted(scoring),['b','k']):
+        sample_score_mean = results['mean_%s_%s' % (sample,scorer)]
+        sample_score_std = results['std_%s_%s' % (sample,scorer)]
+        
+        ax.fill_between(X_axis,sample_score_mean - sample_score_std,
+                       sample_score_mean + sample_score_std,
+                       alpha=0.1 if sample=='test' else 0,color=color)
+        ax.plot(X_axis, sample_score_mean, style, color=color,
+                alpha=1 if sample == 'test' else 0.7,
+                label='%s (%s)' % (scorer,sample))
+        
+        best_index = np.nonzero(results['rank_test_%s' % scorer]==1)[0][0]
+        best_score = results['mean_test_%s' % scorer][best_index]
+        
+        #plot a dotted vertical line at the best score for that scorer marked by x
+        ax.plot([X_axis[best_index]]*2,[0,best_score],
+                linestyle='-.',color=color,marker='x',markeredgewidth=3,ms=8)
+    
+        ax.annotate('%0.4f' % best_score,
+                  (X_axis[best_index],best_score+pad))
+        
+    plt.legend(loc='best')
+    plt.grid('off')
+    plt.tight_layout()
+    
+    if save:
+        plt.savefig(saves,dpi=100)
+    
+    plt.show()
+
+
+def print_clustering_scores(labels_true,labels_pred):
+    print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels_pred))
+    print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels_pred))
+    print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels_pred))
+    print("Adjusted Rand Index: %0.3f"
+        % metrics.adjusted_rand_score(labels_true, labels_pred))
+    print("Adjusted Mutual Information: %0.3f"
+        % metrics.adjusted_mutual_info_score(labels_true, labels_pred,
+                                            average_method='arithmetic'))
+    # print("Silhouette Coefficient: %0.3f"
+    #     % metrics.silhouette_score(X, labels))
