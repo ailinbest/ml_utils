@@ -339,6 +339,9 @@ def plot_gridsearch_cv(results,param_name,scoring,x_min,x_max,y_min,y_max,save=F
 
 
 def print_clustering_scores(labels_true,labels_pred):
+    """
+    以下scores都在[0,1]之间，越大越好
+    """
     print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels_pred))
     print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels_pred))
     print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels_pred))
@@ -347,5 +350,15 @@ def print_clustering_scores(labels_true,labels_pred):
     print("Adjusted Mutual Information: %0.3f"
         % metrics.adjusted_mutual_info_score(labels_true, labels_pred,
                                             average_method='arithmetic'))
-    # print("Silhouette Coefficient: %0.3f"
-    #     % metrics.silhouette_score(X, labels))
+    print("Fowlkes and Mallows Index: %0.3f" % metrics.fowlkes_mallows_score(labels_true,labels_pred))
+
+
+def print_silhoutte_scores(X,labels_pred):
+    """
+    打印轮廓系数，完全是非监督的方式
+    Silhouetee coefficient在[-1,1]，越大越好
+    DB score: 
+    """
+    print('Silhouette coefficient:{:.4f}'.format(metrics.silhouette_score(X,labels_pred)))
+    print('Davies Bouldin score:{:.4f}'.format(metrics.davies_bouldin_score(X,labels_pred)))
+    print('Calinski Harabasez score:{:.4f}'.format(metrics.calinski_harabasz_score(X,labels_pred)))
