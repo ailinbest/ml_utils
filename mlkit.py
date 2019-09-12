@@ -413,6 +413,6 @@ def print_silhoutte_scores(X,labels_pred):
     Silhouetee coefficient在[-1,1]，越大越好
     DB score: 
     """
-    print('Silhouette coefficient:{:.4f}'.format(metrics.silhouette_score(X,labels_pred)))
+    print('Silhouette coefficient:{:.4f}'.format(metrics.silhouette_score(X,labels_pred,metric='euclidean')))
     print('Davies Bouldin score:{:.4f}'.format(metrics.davies_bouldin_score(X,labels_pred)))
     print('Calinski Harabasez score:{:.4f}'.format(metrics.calinski_harabasz_score(X,labels_pred)))
