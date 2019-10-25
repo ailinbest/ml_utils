@@ -2,3 +2,4 @@ nohup.out
 .ipynb_checkpoints
 .idea/
 __pycache__
+venv
