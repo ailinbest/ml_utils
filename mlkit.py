@@ -118,7 +118,7 @@ def plot_pie(data_series, title=None, startangle=0, pctdistance=0.7,
     plt.show()
 
 
-def plot_learning_curve(estimator, X, y, title='Learning Curve', ylim=((1.01, 0.7)), cv=5,
+def plot_learning_curve(estimator, X, y, title='Learning Curve', ylim=((1.01, 0.7)), cv=5, n_jobs=None,
                         train_sizes=np.linspace(.1, 1.0, 5)):
     """
     Generate a simple plot of the test and training learning curve.
